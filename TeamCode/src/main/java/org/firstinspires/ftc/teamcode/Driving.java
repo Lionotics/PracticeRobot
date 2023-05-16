@@ -11,15 +11,17 @@ import com.qualcomm.robotcore.hardware.Servo;
 @TeleOp(name = "DrivingTeleop")
     public class Driving  extends LinearOpMode {
     Servo claw;
-    Servo tilt;
     DcMotor frontLeft, frontRight, backLeft, backRight;
+    DcMotor lift1, lift2;
+    int motorTop = 10000;
 
 
 
     @Override
     public void runOpMode() throws InterruptedException {
         claw = hardwareMap.servo.get("claw");
-        tilt = hardwareMap.servo.get("tilt");
+        lift1 = hardwareMap.dcMotor.get("lift1");
+        lift2 = hardwareMap.dcMotor.get("lift2");
         frontLeft = hardwareMap.dcMotor.get("leftFront");
         frontRight = hardwareMap.dcMotor.get("rightFront");
         backLeft = hardwareMap.dcMotor.get("leftBack");
@@ -27,7 +29,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 
         frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         backRight.setDirection(DcMotorSimple.Direction.REVERSE);
-
+        lift1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        lift2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -35,6 +38,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
         waitForStart();
         while (opModeIsActive()){
+            //the claww
             if (gamepad1.x) {
                 claw.setPosition(0.35);
             }
@@ -42,24 +46,21 @@ import com.qualcomm.robotcore.hardware.Servo;
                 claw.setPosition(0);
 
             }
-            if (gamepad1.y){
-                tilt.setPosition(0.22);
+                if  (gamepad1.dpad_up && lift1.getCurrentPosition()< motorTop){
+                lift1.setPower(1);
+                lift2.setPower(1);
+            } else if (gamepad1.dpad_down&& lift1.getCurrentPosition()>0) {
+                lift1.setPower(-1);
+                lift2.setPower(-1);
+
             }
-            if (gamepad1.a){
-                tilt.setPosition(0.35);
-            }
+        }
 
-            double y = -gamepad1.left_stick_y;
-            double x  = gamepad1.left_stick_x;
-            double rx = gamepad1.right_stick_x;
-
-            frontRight.setPower(y-x - rx);
-            frontLeft.setPower(y+x + rx);
-            backRight.setPower(y+x-rx);
-            backLeft.setPower(y-x + rx);
-
-
-
+            //drivning
+            frontRight.setPower(gamepad1.right_stick_y);
+            backRight.setPower(gamepad1.right_stick_y);
+            frontLeft.setPower(gamepad1.left_stick_y);
+            backLeft.setPower(gamepad1.left_stick_y);
         }
 
     }
