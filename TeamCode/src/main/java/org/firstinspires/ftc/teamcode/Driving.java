@@ -38,7 +38,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
         waitForStart();
         while (opModeIsActive()){
-            //the claww
+            //opens and closes claw
             if (gamepad1.x) {
                 claw.setPosition(0.35);
             }
@@ -56,7 +56,7 @@ import com.qualcomm.robotcore.hardware.Servo;
             }
         }
 
-            //drivning
+            //set controls for driving
             frontRight.setPower(gamepad1.right_stick_y);
             backRight.setPower(gamepad1.right_stick_y);
             frontLeft.setPower(gamepad1.left_stick_y);
