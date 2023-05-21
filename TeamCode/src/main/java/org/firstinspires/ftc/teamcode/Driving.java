@@ -1,11 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp(name = "DrivingTeleop")
@@ -14,6 +12,11 @@ import com.qualcomm.robotcore.hardware.Servo;
     DcMotor frontLeft, frontRight, backLeft, backRight;
     DcMotor lift1, lift2;
     int motorTop = 10000;
+
+    enum Target {No_TARGET,UP,DOWN};
+    Target currentTarget = Target.No_TARGET;
+
+    
 
 
 
@@ -38,25 +41,37 @@ import com.qualcomm.robotcore.hardware.Servo;
 
         waitForStart();
         while (opModeIsActive()){
-            //opens and closes claw
+            //closes and opens the claw
             if (gamepad1.x) {
                 claw.setPosition(0.35);
             }
             if (gamepad1.b) {
                 claw.setPosition(0);
-
             }
-                if  (gamepad1.dpad_up && lift1.getCurrentPosition()< motorTop){
+            if (gamepad1.a) {
+                currentTarget = Target.UP;
+            if (gamepad1.y) {
+                currentTarget = Target.DOWN;
+            }
+
+            if (gamepad1.dpad_up || gamepad1.dpad_down) {
+                currentTarget = Target.No_TARGET;
+            }
+
+            if  ((currentTarget == Target.UP ||  gamepad1.dpad_up) && lift1.getCurrentPosition()< motorTop){
                 lift1.setPower(1);
                 lift2.setPower(1);
-            } else if (gamepad1.dpad_down&& lift1.getCurrentPosition()>0) {
+            } else if ((currentTarget == Target.DOWN || gamepad1.dpad_down) && lift1.getCurrentPosition()>0) {
                 lift1.setPower(-1);
                 lift2.setPower(-1);
 
             }
+
+
+
         }
 
-            //set controls for driving
+            //controls for driving
             frontRight.setPower(gamepad1.right_stick_y);
             backRight.setPower(gamepad1.right_stick_y);
             frontLeft.setPower(gamepad1.left_stick_y);
