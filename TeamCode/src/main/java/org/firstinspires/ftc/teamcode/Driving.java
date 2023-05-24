@@ -16,7 +16,7 @@ import com.qualcomm.robotcore.hardware.Servo;
     enum Target {No_TARGET,UP,DOWN};
     Target currentTarget = Target.No_TARGET;
 
-    
+
 
 
 
@@ -40,36 +40,45 @@ import com.qualcomm.robotcore.hardware.Servo;
         frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         waitForStart();
-        while (opModeIsActive()){
+        while (opModeIsActive()) {
             //closes and opens the claw
-            if (gamepad1.x) {
-                claw.setPosition(0.35);
+            if (gamepad2.left_bumper) {
+                claw.setPosition(1);
             }
-            if (gamepad1.b) {
-                claw.setPosition(0);
-            }
-            if (gamepad1.a) {
-                currentTarget = Target.UP;
-            if (gamepad1.y) {
-                currentTarget = Target.DOWN;
+            if (gamepad2.right_bumper) {
+                claw.setPosition(0.3);
             }
 
-            if (gamepad1.dpad_up || gamepad1.dpad_down) {
+            if (gamepad2.left_trigger > 0) {
+                //      currentTarget = Target.UP;
+            }
+            if (gamepad2.right_trigger > 0) {
+                //  currentTarget = Target.DOWN;
+            }
+
+            if (gamepad2.dpad_up || gamepad2.dpad_down) {
                 currentTarget = Target.No_TARGET;
             }
 
-            if  ((currentTarget == Target.UP ||  gamepad1.dpad_up) && lift1.getCurrentPosition()< motorTop){
+            if ((currentTarget == Target.UP || gamepad2.dpad_up)){ //&& lift1.getCurrentPosition() < motorTop) {
                 lift1.setPower(1);
                 lift2.setPower(1);
-            } else if ((currentTarget == Target.DOWN || gamepad1.dpad_down) && lift1.getCurrentPosition()>0) {
+            } else if ((currentTarget == Target.DOWN || gamepad2.dpad_down)) { //&& lift1.getCurrentPosition()>0) {
                 lift1.setPower(-1);
                 lift2.setPower(-1);
 
+            } else {
+                lift1.setPower(0);
+                lift2.setPower(0);
             }
 
+            if (lift1.getTargetPosition() >= motorTop || lift1.getCurrentPosition() <= 0) {
+                currentTarget = Target.No_TARGET;
+            }
 
+            telemetry.addLine(String.valueOf(lift1.getCurrentPosition()));
+            telemetry.update();
 
-        }
 
             //controls for driving
             frontRight.setPower(gamepad1.right_stick_y);
@@ -77,6 +86,7 @@ import com.qualcomm.robotcore.hardware.Servo;
             frontLeft.setPower(gamepad1.left_stick_y);
             backLeft.setPower(gamepad1.left_stick_y);
         }
-
     }
-}
+    }
+
+
